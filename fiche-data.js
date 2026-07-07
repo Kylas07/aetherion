@@ -2,11 +2,11 @@
   /* ---- groups (les statuts du jeu) ---- */
   const GROUPS = ['Ascendants', 'Ancrés', 'Brisés', 'Éveillés', 'Killers'];
   const GROUP_META = {
-    'Ascendants': { color: '#E0A92B', tag: 'Ils grimpent les étages, coûte que coûte.' },
-    'Ancrés':     { color: '#3C8FE0', tag: 'Ils ont fait de ce monde leur foyer.' },
-    'Brisés':     { color: '#6E5A9B', tag: 'Le jeu a eu raison d\u2019eux.' },
-    'Éveillés':   { color: '#2FA7A0', tag: 'Ils cherchent la vérité derrière Aetherion.' },
-    'Killers':    { color: '#D6365A', tag: 'Tuer un joueur, c\u2019est tuer un humain.' }
+    'Ascendants': { color: '#5CA35E', tag: 'Où la majorité apprend à survivre… Ils ont choisi de lutter.' },
+    'Ancrés':     { color: '#6FBEBD', tag: 'Quand le chaos a frappé, tous n’ont pas choisi de courir vers le danger' },
+    'Brisés':     { color: '#9285D1', tag: 'Tout le monde ne survit pas à Aetherion' },
+    'Éveillés':   { color: '#DBAE61', tag: 'Ils ont tourné leur regard vers une autre vérité' },
+    'Killers':    { color: '#DD5555', tag: 'Dans ce monde, la morale est un luxe' }
   };
   function groupColor(g) { return (GROUP_META[g] || {}).color || '#C25C3A'; }
   function groupTag(g) { return (GROUP_META[g] || {}).tag || ''; }

@@ -59,22 +59,22 @@
 
   const DEFAULT_FICHE = {
     accent: '#C25C3A',
-    name: 'Rennac Solheim',
-    alias: 'Le Colporteur du Troisième Étage',
+    name: 'PRENOM NOM',
+    alias: 'LE GARS TROP COOL',
     banner: '',
     portrait: '',
     photo: '',
     age: '27 ans',
-    sexe: 'Masculin',
-    birthday: '14 février',
-    occupation: 'Marchand ambulant · guide de bas-étages',
+    sexe: '',
+    birthday: '',
+    occupation: '',
     group: 'Ancrés',
     traits: ['Débrouillard', 'Bavard', 'Méfiant', 'Loyal', 'Opportuniste', 'Protecteur'],
-    realWorld: "Développeur junior de 27 ans, Rennac s'était offert Aetherion le jour du lancement pour fuir un open space sans fenêtres.\nIl n'a prévenu personne avant de mettre le casque : il comptait juste \u00ab tester deux heures \u00bb.",
-    personality: "Rennac parle vite, tout le temps, et rarement pour ne rien dire. Sous la faconde du marchand se cache un survivant méthodique qui a compris très tôt qu'on tient plus longtemps en réseau qu'en solitaire.\n\nIl refuse de grimper les étages : trop de morts, trop de héros. Sa stratégie tient en une phrase — rester utile à tout le monde pour n'être l'ennemi de personne.",
-    pokemon: { sprite: '', name: 'Braise', species: 'Goupix', types: ['Feu'], level: 22, nature: 'Assuré', desc: "Trouvé tremblant dans les décombres de l'étage 2. Braise sert de chaufferette, de vigie et d'associé commercial — il flaire les clients honnêtes." },
-    history: "Les trois premiers jours, Rennac a fait comme tout le monde : il a paniqué.\nPuis il a ouvert son sac, compté ses objets, et ouvert boutique.\n\nDeux ans plus tard, sa camelote a sauvé plus de vies que bien des épées. Il connaît chaque PNJ marchand, chaque raccourci, chaque rumeur — et il vend l'information au prix fort, sauf quand il s'agit d'un gamin perdu.",
-    player: { pseudo: 'kylas', age: '', country: 'Belgique', note: "Réponds vite en journée, plus lente le soir. RP long apprécié mais je m'adapte." }
+    realWorld: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris porta leo vel bibendum feugiat. Quisque venenatis lacinia augue ut placerat. Cras sodales enim in metus rhoncus, quis dictum felis molestie. Maecenas eu quam consectetur, tristique velit ac, semper lectus. Morbi in consectetur nunc, a mollis ex. Donec sem tortor, pretium eu eleifend a, tincidunt et arcu. Nam aliquet odio et metus maximus, a pellentesque purus finibus. Pellentesque non ullamcorper dolor. Sed leo odio, varius sit amet tempor in, luctus eget nulla. Sed ac ornare felis. Nunc velit velit, eleifend vitae placerat eget, vestibulum eget odio. Praesent nec metus et dui accumsan mattis. Cras tempus ante sit amet ultrices convallis. Morbi in dui eget nunc hendrerit lobortis vitae a odio.",
+    personality: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris porta leo vel bibendum feugiat. Quisque venenatis lacinia augue ut placerat. Cras sodales enim in metus rhoncus, quis dictum felis molestie. Maecenas eu quam consectetur, tristique velit ac, semper lectus. Morbi in consectetur nunc, a mollis ex. Donec sem tortor, pretium eu eleifend a, tincidunt et arcu. Nam aliquet odio et metus maximus, a pellentesque purus finibus. Pellentesque non ullamcorper dolor. Sed leo odio, varius sit amet tempor in, luctus eget nulla. Sed ac ornare felis. Nunc velit velit, eleifend vitae placerat eget, vestibulum eget odio. Praesent nec metus et dui accumsan mattis. Cras tempus ante sit amet ultrices convallis. Morbi in dui eget nunc hendrerit lobortis vitae a odio.",
+    pokemon: { sprite: '', name: 'Braise', species: 'Goupix', types: ['Feu'], level: 22, nature: 'Assuré', desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris porta leo vel bibendum feugiat. Quisque venenatis lacinia augue ut placerat. Cras sodales enim in metus rhoncus, quis dictum felis molestie. Maecenas eu quam consectetur, tristique velit ac, semper lectus. Morbi in consectetur nunc, a mollis ex. Donec sem tortor, pretium eu eleifend a, tincidunt et arcu. Nam aliquet odio et metus maximus, a pellentesque purus finibus. Pellentesque non ullamcorper dolor. Sed leo odio, varius sit amet tempor in, luctus eget nulla. Sed ac ornare felis. Nunc velit velit, eleifend vitae placerat eget, vestibulum eget odio. Praesent nec metus et dui accumsan mattis. Cras tempus ante sit amet ultrices convallis. Morbi in dui eget nunc hendrerit lobortis vitae a odio." },
+    history: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris porta leo vel bibendum feugiat. Quisque venenatis lacinia augue ut placerat. Cras sodales enim in metus rhoncus, quis dictum felis molestie. Maecenas eu quam consectetur, tristique velit ac, semper lectus. Morbi in consectetur nunc, a mollis ex. Donec sem tortor, pretium eu eleifend a, tincidunt et arcu. Nam aliquet odio et metus maximus, a pellentesque purus finibus. Pellentesque non ullamcorper dolor. Sed leo odio, varius sit amet tempor in, luctus eget nulla. Sed ac ornare felis. Nunc velit velit, eleifend vitae placerat eget, vestibulum eget odio. Praesent nec metus et dui accumsan mattis. Cras tempus ante sit amet ultrices convallis. Morbi in dui eget nunc hendrerit lobortis vitae a odio.",
+    player: { pseudo: 'kylas', age: '', country: 'FUSEAU HORAIRE', note: "J'adore Mirabelle" }
   };
 
   function normalize(d) {

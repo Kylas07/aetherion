@@ -1,3 +1,8 @@
+/* Shared data + helpers for the Aetherion "fiche de présentation" editor — v2 layout.
+   Exposes everything on window.FICHE.
+   Récupération = scan of a pasted/fetched fiche DOM (no base64 blob):
+   every field lives in a semantic class or a data-* attribute so the sheet
+   can be re-read even if the CSS changes. */
 (function () {
   /* ---- groups (les statuts du jeu) ---- */
   const GROUPS = ['Ascendants', 'Ancrés', 'Brisés', 'Éveillés', 'Killers'];
@@ -47,32 +52,29 @@
     return d.value.replace(/\u00a0/g, ' ').replace(/[ \t]+\n/g, '\n').trim();
   }
 
-  const THEME = {
-    card: '#FFFFFF', header: '#211C18', headText: '#FFFFFF', headMuted: '#EDE6DD',
-    inset: '#F8F5F0', insetBorder: '#ECE6DD', border: '#E7E2DA',
-    head: '#26221D', body: '#4E483F', muted: '#948B7F',
-    disp: "'Oswald','Arial Narrow',Verdana,sans-serif",
-    bodyFont: "'Barlow',Verdana,Geneva,sans-serif",
-    shadow: '0 18px 44px -22px rgba(45,38,30,.38)',
-    stripe: 'repeating-linear-gradient(45deg,#F0ECE4 0 7px,#E7E1D8 7px 14px)'
-  };
+  const DISP = "'Oswald','Arial Narrow',Verdana,sans-serif";
+  const BODYF = "'Barlow',Verdana,Geneva,sans-serif";
+  const STRIPE_D = 'repeating-linear-gradient(45deg,#2A2420 0 8px,#211C18 8px 16px)';
+  const STRIPE_L = 'repeating-linear-gradient(45deg,#F0ECE4 0 7px,#E7E1D8 7px 14px)';
 
   const DEFAULT_FICHE = {
     accent: '#C25C3A',
-    name: 'Nom Prénom',
-    alias: 'Une personne giga cool',
+    name: 'Rennac Solheim',
+    alias: 'Le Colporteur du Troisième Étage',
+    banner: '',
     portrait: '',
-    age: '999 ans',
-    sexe: 'Oui',
-    birthday: 'Un beau jour',
-    occupation: 'Kirito le plu fort',
+    photo: '',
+    age: '27 ans',
+    sexe: 'Masculin',
+    birthday: '14 février',
+    occupation: 'Marchand ambulant · guide de bas-étages',
     group: 'Ancrés',
-    traits: ['traits', 'traits', 'traits', 'traits', 'traits', 'traits'],
-    realWorld: "qui étais-tu autrefois?",
-    personality: "La personnalité de ton personnage",
-    pokemon: { sprite: '', name: 'Nom', species: 'Espèce du pkm', types: ['Feu'], level: 05, nature: 'Assuré', desc: "info sur le pokemon" },
-    history: "Des infos sur le pokémon ?",
-    player: { pseudo: 'ton pseudo', age: '99', country: 'Ton fuseau horaire', note: "J'adore Kylas de fou" }
+    traits: ['Débrouillard', 'Bavard', 'Méfiant', 'Loyal', 'Opportuniste', 'Protecteur'],
+    realWorld: "Développeur junior de 27 ans, Rennac s'était offert Aetherion le jour du lancement pour fuir un open space sans fenêtres.\nIl n'a prévenu personne avant de mettre le casque : il comptait juste \u00ab tester deux heures \u00bb.",
+    personality: "Rennac parle vite, tout le temps, et rarement pour ne rien dire. Sous la faconde du marchand se cache un survivant méthodique qui a compris très tôt qu'on tient plus longtemps en réseau qu'en solitaire.\n\nIl refuse de grimper les étages : trop de morts, trop de héros. Sa stratégie tient en une phrase — rester utile à tout le monde pour n'être l'ennemi de personne.",
+    pokemon: { sprite: '', name: 'Braise', species: 'Goupix', types: ['Feu'], level: 22, nature: 'Assuré', desc: "Trouvé tremblant dans les décombres de l'étage 2. Braise sert de chaufferette, de vigie et d'associé commercial — il flaire les clients honnêtes." },
+    history: "Les trois premiers jours, Rennac a fait comme tout le monde : il a paniqué.\nPuis il a ouvert son sac, compté ses objets, et ouvert boutique.\n\nDeux ans plus tard, sa camelote a sauvé plus de vies que bien des épées. Il connaît chaque PNJ marchand, chaque raccourci, chaque rumeur — et il vend l'information au prix fort, sauf quand il s'agit d'un gamin perdu.",
+    player: { pseudo: 'kylas', age: '', country: 'Belgique', note: "Réponds vite en journée, plus lente le soir. RP long apprécié mais je m'adapte." }
   };
 
   function normalize(d) {
@@ -83,7 +85,9 @@
       accent: d.accent || '#C25C3A',
       name: d.name != null ? d.name : '',
       alias: d.alias != null ? d.alias : '',
+      banner: d.banner || '',
       portrait: d.portrait || '',
+      photo: d.photo || '',
       age: d.age != null ? d.age : '',
       sexe: d.sexe != null ? d.sexe : '',
       birthday: d.birthday != null ? d.birthday : '',
@@ -106,69 +110,96 @@
     };
   }
 
-  /* ================= BUILD ================= */
+  /* ================= BUILD (layout v2 : bannière + portrait latéral + scrolls) ================= */
   const FICHE_CSS =
-    "@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&display=swap');" +
-    '.aeth-fiche{width:650px;max-width:100%;margin:0 auto;font-family:' + THEME.bodyFont + ';background:' + THEME.card + ';border:1px solid ' + THEME.border + ';border-radius:16px;overflow:hidden;box-shadow:' + THEME.shadow + ';color:' + THEME.body + '}' +
+    "@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');" +
+    '.aeth-fiche{width:650px;max-width:100%;margin:0 auto;font-family:' + BODYF + ';background:#FFFFFF;border:1px solid #E7E2DA;border-radius:16px;overflow:hidden;box-shadow:0 18px 44px -22px rgba(45,38,30,.38);color:#4E483F}' +
     '.aeth-fiche *{box-sizing:border-box}' +
-    '.aeth-fiche .af-banner{background:' + THEME.header + ';padding:26px 30px;border-bottom:3px solid var(--acc)}' +
-    '.aeth-fiche .af-kick{font-family:' + THEME.disp + ';font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);font-weight:600}' +
-    '.aeth-fiche .af-name{font-family:' + THEME.disp + ';font-size:38px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:' + THEME.headText + ';line-height:1;margin-top:7px}' +
-    '.aeth-fiche .af-alias{font-style:italic;color:' + THEME.headMuted + ';font-size:14px;margin-top:9px;opacity:.92}' +
-    '.aeth-fiche .af-groupband{display:flex;align-items:center;justify-content:center;gap:14px;background:var(--gc);padding:10px 16px;color:#fff}' +
-    '.aeth-fiche .af-groupname{font-family:' + THEME.disp + ';letter-spacing:5px;text-transform:uppercase;font-weight:700;font-size:15px}' +
-    '.aeth-fiche .af-grouptag{font-size:11.5px;font-style:italic;opacity:.9;border-left:1px solid rgba(255,255,255,.4);padding-left:14px}' +
-    '.aeth-fiche .af-idrow{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:' + THEME.insetBorder + '}' +
-    '.aeth-fiche .af-idcell{background:' + THEME.inset + ';padding:13px 16px}' +
-    '.aeth-fiche .af-idlabel{font-size:9px;letter-spacing:1.4px;text-transform:uppercase;color:' + THEME.muted + ';font-weight:700}' +
-    '.aeth-fiche .af-idval{font-size:13.5px;font-weight:600;color:' + THEME.head + ';margin-top:3px}' +
-    '.aeth-fiche .af-sec{padding:22px 30px}' +
-    '.aeth-fiche .af-sec+.af-sec{border-top:1px solid ' + THEME.border + '}' +
-    '.aeth-fiche .af-sech{font-family:' + THEME.disp + ';font-size:13px;letter-spacing:2.5px;text-transform:uppercase;color:var(--acc);font-weight:600;display:flex;align-items:center;gap:13px;margin-bottom:15px}' +
-    '.aeth-fiche .af-sech::after{content:"";flex:1;height:2px;background:var(--acc);opacity:.28;border-radius:2px}' +
-    '.aeth-fiche .af-fold>summary{list-style:none;cursor:pointer;margin-bottom:0}' +
-    '.aeth-fiche .af-fold>summary::-webkit-details-marker{display:none}' +
-    '.aeth-fiche summary.af-sech::after{display:none}' +
-    '.aeth-fiche .af-fold[open]>summary{margin-bottom:15px}' +
-    '.aeth-fiche .af-line{flex:1;height:2px;background:var(--acc);opacity:.28;border-radius:2px}' +
-    '.aeth-fiche .af-chev{font-size:10px;opacity:.6;transition:transform .2s;flex:none}' +
-    '.aeth-fiche .af-fold[open]>summary .af-chev{transform:rotate(180deg)}' +
-    '.aeth-fiche .af-traits{display:flex;flex-wrap:wrap;gap:7px}' +
-    '.aeth-fiche .af-trait{background:' + THEME.inset + ';border:1px solid ' + THEME.insetBorder + ';border-radius:7px;padding:6px 13px;font-size:12.5px;font-weight:600;color:' + THEME.body + '}' +
-    '.aeth-fiche .af-perso{display:flex;gap:22px;flex-wrap:wrap}' +
-    '.aeth-fiche .af-portrait{width:250px;flex:none;aspect-ratio:250/350;border-radius:13px;overflow:hidden;border:1px solid ' + THEME.border + ';background:' + THEME.stripe + ';display:flex;align-items:center;justify-content:center}' +
+    '.aeth-fiche .ph{font-family:monospace;font-size:11px;color:#948B7F}' +
+    /* bannière */
+    '.aeth-fiche .af-banner{position:relative;height:240px;background:' + STRIPE_D + ';overflow:hidden}' +
+    '.aeth-fiche .af-banner-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}' +
+    '.aeth-fiche .af-banner-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:11px;color:#8B837A}' +
+    '.aeth-fiche .af-banner-grad{position:absolute;inset:0;background:linear-gradient(180deg,rgba(33,28,24,.15) 0%,rgba(33,28,24,0) 35%,rgba(33,28,24,.88) 100%)}' +
+    '.aeth-fiche .af-kick{position:absolute;left:26px;top:18px;font-family:' + DISP + ';font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#FFFFFF;font-weight:600;opacity:.85}' +
+    '.aeth-fiche .af-groupchip{position:absolute;right:26px;top:14px;background:var(--gc);border-radius:999px;padding:6px 16px;color:#FFFFFF}' +
+    '.aeth-fiche .af-groupname{font-family:' + DISP + ';letter-spacing:3px;text-transform:uppercase;font-weight:700;font-size:12px}' +
+    '.aeth-fiche .af-headline{position:absolute;left:26px;right:26px;bottom:18px}' +
+    '.aeth-fiche .af-name{font-family:' + DISP + ';font-size:40px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#FFFFFF;line-height:1;text-shadow:0 2px 10px rgba(0,0,0,.5)}' +
+    '.aeth-fiche .af-alias{font-style:italic;color:#EDE6DD;font-size:14px;margin-top:7px;opacity:.95}' +
+    '.aeth-fiche .af-grouptag{font-style:normal;font-weight:600;color:#FFFFFF}' +
+    '.aeth-fiche .af-accentbar{height:4px;background:linear-gradient(90deg,var(--acc) 0 250px,var(--gc) 250px)}' +
+    /* corps : colonne portrait + textes */
+    '.aeth-fiche .af-body{display:flex;align-items:stretch}' +
+    '.aeth-fiche .af-side{width:250px;flex:none;background:#F8F5F0;border-right:1px solid #ECE6DD;display:flex;flex-direction:column}' +
+    '.aeth-fiche .af-portrait{width:250px;height:350px;background:' + STRIPE_L + ';display:flex;align-items:center;justify-content:center;border-bottom:1px solid #ECE6DD;overflow:hidden}' +
     '.aeth-fiche .af-portrait img{width:100%;height:100%;object-fit:cover;display:block}' +
-    '.aeth-fiche .af-portrait .ph{font-family:monospace;font-size:11px;color:' + THEME.muted + '}' +
-    '.aeth-fiche .af-txt{flex:1;min-width:220px}' +
-    '.aeth-fiche .af-txt p{margin:0 0 12px;font-size:13.5px;line-height:1.72}.aeth-fiche .af-txt p:last-child{margin-bottom:0}' +
-    '.aeth-fiche .af-personality{max-height:350px;overflow-y:auto;padding-right:10px}' +
-    '.aeth-fiche .af-pkmn{display:flex;gap:18px;align-items:center;background:' + THEME.header + ';border-radius:14px;padding:18px 20px}' +
+    '.aeth-fiche .af-idlist{padding:16px 20px 6px;display:grid;gap:12px}' +
+    '.aeth-fiche .af-idlabel{font-size:9px;letter-spacing:1.4px;text-transform:uppercase;color:#948B7F;font-weight:700}' +
+    '.aeth-fiche .af-idval{font-size:13.5px;font-weight:600;color:#26221D;margin-top:2px}' +
+    '.aeth-fiche .af-sidetraits{padding:14px 20px 20px;margin-top:auto}' +
+    '.aeth-fiche .af-sidetraits .af-idlabel{margin-bottom:8px}' +
+    '.aeth-fiche .af-traits{display:flex;flex-wrap:wrap;gap:6px}' +
+    '.aeth-fiche .af-trait{background:#FFFFFF;border:1px solid #ECE6DD;border-radius:6px;padding:4px 10px;font-size:11.5px;font-weight:600;color:#4E483F}' +
+    '.aeth-fiche .af-main{flex:1;min-width:0;padding:22px 26px;display:grid;gap:22px;align-content:start}' +
+    /* sections */
+    '.aeth-fiche .af-sech{font-family:' + DISP + ';font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--acc);font-weight:600;display:flex;align-items:center;gap:12px;margin-bottom:11px}' +
+    '.aeth-fiche .af-sech::after{content:"";flex:1;height:2px;background:var(--acc);opacity:.28;border-radius:2px}' +
+    '.aeth-fiche .af-scroll{max-height:300px;overflow-y:auto;padding-right:8px}' +
+    '.aeth-fiche .af-txt p{margin:0 0 12px;font-size:13.5px;line-height:1.7}.aeth-fiche .af-txt p:last-child{margin-bottom:0}' +
+    /* histoire : image carrée + texte */
+    '.aeth-fiche .af-histsec{padding:22px 26px;border-top:1px solid #E7E2DA}' +
+    '.aeth-fiche .af-histrow{display:flex;gap:20px;align-items:flex-start}' +
+    '.aeth-fiche .af-photo{width:220px;height:220px;flex:none;border-radius:13px;overflow:hidden;border:1px solid #E7E2DA;background:' + STRIPE_L + ';display:flex;align-items:center;justify-content:center}' +
+    '.aeth-fiche .af-photo img{width:100%;height:100%;object-fit:cover;display:block}' +
+    '.aeth-fiche .af-histtxt{flex:1;min-width:0}' +
+    /* pokémon fétiche */
+    '.aeth-fiche .af-pkmn{background:#211C18;padding:20px 26px;display:flex;gap:18px;align-items:center}' +
     '.aeth-fiche .af-pkmn-sprite{width:104px;height:104px;flex:none;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12)}' +
     '.aeth-fiche .af-pkmn-sprite img{max-width:100%;max-height:100%;object-fit:contain;image-rendering:pixelated}' +
-    '.aeth-fiche .af-pkmn-sprite .ph{font-family:monospace;font-size:10px;color:#8B837A}' +
+    '.aeth-fiche .af-pkmn-sprite .ph{font-size:10px;color:#8B837A}' +
     '.aeth-fiche .af-pkmn-body{flex:1;min-width:0}' +
+    '.aeth-fiche .af-pkmn-kick{font-family:' + DISP + ';font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:#E8B49A;font-weight:600;margin-bottom:5px}' +
     '.aeth-fiche .af-pkmn-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}' +
-    '.aeth-fiche .af-pkmn-name{font-family:' + THEME.disp + ';font-size:22px;font-weight:700;letter-spacing:.5px;color:var(--acc)}' +
-    '.aeth-fiche .af-pkmn-meta{font-size:12px;color:' + THEME.headMuted + '}' +
-    '.aeth-fiche .af-pkmn-types{display:flex;gap:5px;margin:9px 0}' +
+    '.aeth-fiche .af-pkmn-name{font-family:' + DISP + ';font-size:22px;font-weight:700;letter-spacing:.5px;color:var(--acc)}' +
+    '.aeth-fiche .af-pkmn-meta{font-size:12px;color:#EDE6DD}' +
     '.aeth-fiche .af-pkmn-type{color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:.3px}' +
-    '.aeth-fiche .af-pkmn-desc{margin:0;font-size:12.5px;line-height:1.62;color:' + THEME.headMuted + ';font-style:italic}' +
-    '.aeth-fiche .af-player{background:' + THEME.inset + ';border:1px solid ' + THEME.insetBorder + ';border-radius:13px;padding:18px 20px}' +
-    '.aeth-fiche .af-player-grid{display:flex;gap:26px;flex-wrap:wrap;margin-bottom:10px}' +
-    '.aeth-fiche .af-player-cell .l{font-size:9px;letter-spacing:1.4px;text-transform:uppercase;color:' + THEME.muted + ';font-weight:700}' +
-    '.aeth-fiche .af-player-cell .v{font-size:14px;font-weight:700;color:' + THEME.head + ';margin-top:2px}' +
-    '.aeth-fiche .af-player-note{margin:0;font-size:12.5px;line-height:1.6;color:' + THEME.body + '}' +
-    '.aeth-fiche .af-empty{font-size:12px;color:' + THEME.muted + ';font-style:italic}';
+    '.aeth-fiche .af-pkmn-desc{margin:8px 0 0;font-size:12.5px;line-height:1.6;color:#EDE6DD;font-style:italic}' +
+    /* derrière l'écran */
+    '.aeth-fiche .af-player{background:#F8F5F0;border-top:1px solid #ECE6DD;padding:16px 26px;display:flex;gap:8px 26px;align-items:baseline;flex-wrap:wrap}' +
+    '.aeth-fiche .af-player-kick{font-family:' + DISP + ';font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#948B7F;font-weight:600}' +
+    '.aeth-fiche .af-plc{font-size:13px;color:#26221D}' +
+    '.aeth-fiche .af-plc .l{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#948B7F;font-weight:700;margin-right:5px}' +
+    '.aeth-fiche .af-player-note{margin:2px 0 0;font-size:12px;line-height:1.6;color:#4E483F;font-style:italic;width:100%}' +
+    '.aeth-fiche .af-empty{font-size:12px;color:#948B7F;font-style:italic}';
 
   function buildFicheHTML(d, inlineCss) {
     d = normalize(d);
     const withCss = inlineCss !== false;
     const acc = d.accent || '#C25C3A';
     const gc = groupColor(d.group);
+    const tag = groupTag(d.group);
+
+    const banner = d.banner
+      ? '<img class="af-banner-img" src="' + esc(d.banner) + '" alt="">'
+      : '<span class="af-banner-ph">[ bannière · 650 × 240 ]</span>';
 
     const portrait = d.portrait
       ? '<img src="' + esc(d.portrait) + '" alt="">'
-      : '<span class="ph">250 &times; 350</span>';
+      : '<span class="ph">[ avatar · 250 × 350 ]</span>';
+
+    const photo = d.photo
+      ? '<img src="' + esc(d.photo) + '" alt="">'
+      : '<span class="ph">[ image · 220 × 220 ]</span>';
+
+    let aliasLine = '';
+    if (d.alias || tag) {
+      aliasLine = '<div class="af-alias">' +
+        (d.alias ? '\u00ab\u2009<span class="af-aliastxt">' + esc(d.alias) + '</span>\u2009\u00bb' : '') +
+        (d.alias && tag ? ' — ' : '') +
+        (tag ? '<span class="af-grouptag">' + esc(tag) + '</span>' : '') +
+      '</div>';
+    }
 
     const traits = d.traits.filter(function (t) { return t && t.trim(); })
       .map(function (t) { return '<span class="af-trait">' + esc(t) + '</span>'; }).join('')
@@ -185,51 +216,59 @@
     if (p.nature) pkmnMetaBits.push('Nature <span class="af-pkmn-nature">' + esc(p.nature) + '</span>');
 
     const idCell = function (k, label, val) {
-      return '<div class="af-idcell"><div class="af-idlabel">' + label + '</div><div class="af-idval af-' + k + '">' + esc(val || '—') + '</div></div>';
+      return '<div><div class="af-idlabel">' + label + '</div><div class="af-idval af-' + k + '">' + esc(val || '—') + '</div></div>';
     };
 
-    const foldSum = function (title) {
-      return '<summary class="af-sech"><span>' + title + '</span><span class="af-line"></span><span class="af-chev">\u25be</span></summary>';
+    const secMain = function (title, cls, txt) {
+      return '<div><div class="af-sech"><span>' + title + '</span></div>' +
+        '<div class="af-txt af-scroll ' + cls + '">' + txt + '</div></div>';
     };
-    const secRealWorld = d.realWorld.trim()
-      ? '<details class="af-sec af-fold" open>' + foldSum('Qui étais-tu dans le vrai monde ?') + '<div class="af-txt af-realworld">' + textToHtml(d.realWorld) + '</div></details>' : '';
-    const secHistory = d.history.trim()
-      ? '<details class="af-sec af-fold" open>' + foldSum('L\u2019histoire') + '<div class="af-txt af-history">' + textToHtml(d.history) + '</div></details>' : '';
+    const mainSecs =
+      (d.realWorld.trim() ? secMain('Qui étais-tu dans le vrai monde ?', 'af-realworld', textToHtml(d.realWorld)) : '') +
+      secMain('Personnalité', 'af-personality', d.personality.trim() ? textToHtml(d.personality) : '<p class="af-empty">Personnalité à compléter.</p>');
 
-    const playerCell = function (k, label, val) {
-      return '<div class="af-player-cell"><div class="l">' + label + '</div><div class="v af-pl-' + k + '">' + esc(val || '—') + '</div></div>';
+    const histSec = (d.history.trim() || d.photo)
+      ? '<div class="af-histsec"><div class="af-sech"><span>L\u2019histoire</span></div>' +
+        '<div class="af-histrow"><div class="af-photo">' + photo + '</div>' +
+        '<div class="af-histtxt af-txt af-scroll af-history">' + (d.history.trim() ? textToHtml(d.history) : '<p class="af-empty">Histoire à compléter.</p>') + '</div></div></div>'
+      : '';
+
+    const plc = function (k, label, val) {
+      return val ? '<span class="af-plc"><span class="l">' + label + '</span><b class="af-pl-' + k + '">' + esc(val) + '</b></span>' : '';
     };
 
     return '<div class="aeth-fiche" data-accent="' + esc(acc) + '" data-group="' + esc(d.group) + '" style="--acc:' + esc(acc) + ';--gc:' + gc + '">' +
       (withCss ? '<style>' + FICHE_CSS + '</style>' : '') +
-      '<div class="af-banner">' +
+      '<div class="af-banner">' + banner +
+        '<div class="af-banner-grad"></div>' +
         '<div class="af-kick">Aetherion · Fiche de présentation</div>' +
-        '<div class="af-name">' + esc(d.name || 'Sans nom') + '</div>' +
-        (d.alias ? '<div class="af-alias">\u00ab\u2009<span class="af-aliastxt">' + esc(d.alias) + '</span>\u2009\u00bb</div>' : '') +
+        '<div class="af-groupchip"><span class="af-groupname">' + esc(d.group) + '</span></div>' +
+        '<div class="af-headline"><div class="af-name">' + esc(d.name || 'Sans nom') + '</div>' + aliasLine + '</div>' +
       '</div>' +
-      '<div class="af-groupband"><span class="af-groupname">' + esc(d.group) + '</span>' +
-        (groupTag(d.group) ? '<span class="af-grouptag">' + esc(groupTag(d.group)) + '</span>' : '') + '</div>' +
-      '<div class="af-idrow">' +
-        idCell('age', 'Âge', d.age) + idCell('birthday', 'Anniversaire', d.birthday) +
-        idCell('sexe', 'Sexe', d.sexe) + idCell('occupation', 'Occupation dans le jeu', d.occupation) +
+      '<div class="af-accentbar"></div>' +
+      '<div class="af-body">' +
+        '<div class="af-side">' +
+          '<div class="af-portrait">' + portrait + '</div>' +
+          '<div class="af-idlist">' +
+            idCell('age', 'Âge', d.age) + idCell('birthday', 'Anniversaire', d.birthday) +
+            idCell('sexe', 'Sexe', d.sexe) + idCell('occupation', 'Occupation dans le jeu', d.occupation) +
+          '</div>' +
+          '<div class="af-sidetraits"><div class="af-idlabel">Traits de caractère</div><div class="af-traits">' + traits + '</div></div>' +
+        '</div>' +
+        '<div class="af-main">' + mainSecs + '</div>' +
       '</div>' +
-      '<div class="af-sec"><div class="af-sech">Traits de caractère</div><div class="af-traits">' + traits + '</div></div>' +
-      secRealWorld +
-      '<div class="af-sec"><div class="af-sech">Personnalité</div>' +
-        '<div class="af-perso"><div class="af-portrait">' + portrait + '</div>' +
-        '<div class="af-txt af-personality">' + (d.personality.trim() ? textToHtml(d.personality) : '<p class="af-empty">Personnalité à compléter.</p>') + '</div></div></div>' +
-      '<div class="af-sec"><div class="af-sech">Pokémon fétiche</div>' +
-        '<div class="af-pkmn"><div class="af-pkmn-sprite">' + pkmnSprite + '</div>' +
-          '<div class="af-pkmn-body"><div class="af-pkmn-top"><span class="af-pkmn-name">' + esc(p.name || 'Sans nom') + '</span>' +
-            (pkmnMetaBits.length ? '<span class="af-pkmn-meta">' + pkmnMetaBits.join(' · ') + '</span>' : '') + '</div>' +
-            (pkmnTypes ? '<div class="af-pkmn-types">' + pkmnTypes + '</div>' : '') +
-            (p.desc ? '<p class="af-pkmn-desc">' + esc(p.desc) + '</p>' : '') +
-          '</div></div></div>' +
-      secHistory +
-      '<div class="af-sec"><div class="af-sech">Derrière l\u2019écran</div>' +
-        '<div class="af-player"><div class="af-player-grid">' +
-          playerCell('pseudo', 'Pseudo', d.player.pseudo) + playerCell('age', 'Âge', d.player.age) + playerCell('country', 'Pays', d.player.country) +
-        '</div>' + (d.player.note ? '<p class="af-player-note af-pl-note">' + esc(d.player.note) + '</p>' : '') + '</div></div>' +
+      histSec +
+      '<div class="af-pkmn"><div class="af-pkmn-sprite">' + pkmnSprite + '</div>' +
+        '<div class="af-pkmn-body"><div class="af-pkmn-kick">Pokémon fétiche</div>' +
+          '<div class="af-pkmn-top"><span class="af-pkmn-name">' + esc(p.name || 'Sans nom') + '</span>' +
+          (pkmnMetaBits.length ? '<span class="af-pkmn-meta">' + pkmnMetaBits.join(' · ') + '</span>' : '') +
+          pkmnTypes + '</div>' +
+          (p.desc ? '<p class="af-pkmn-desc">' + esc(p.desc) + '</p>' : '') +
+        '</div></div>' +
+      '<div class="af-player"><span class="af-player-kick">Derrière l\u2019écran</span>' +
+        plc('pseudo', 'Pseudo', d.player.pseudo) + plc('age', 'Âge', d.player.age) + plc('country', 'Pays', d.player.country) +
+        (d.player.note ? '<p class="af-player-note af-pl-note">' + esc(d.player.note) + '</p>' : '') +
+      '</div>' +
     '</div>';
   }
 
@@ -253,7 +292,9 @@
       accent: root.getAttribute('data-accent') || (root.style && root.style.getPropertyValue('--acc')) || '#C25C3A',
       name: txt('.af-name'),
       alias: txt('.af-aliastxt'),
+      banner: attr('.af-banner-img', 'src') || attr('.af-banner img', 'src'),
       portrait: attr('.af-portrait img', 'src'),
+      photo: attr('.af-photo img', 'src'),
       age: idval('age'), sexe: idval('sexe'), birthday: idval('birthday'), occupation: idval('occupation'),
       group: GROUPS.indexOf(groupAttr) >= 0 ? groupAttr : 'Ancrés',
       traits: traits,
